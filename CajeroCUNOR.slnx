@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="CajeroCUNOR/SQLproyectoarchivos.sql" />
+    <File Path="CajeroCUNOR/SQLproyectoarchivos23.sql" />
+  </Folder>
+  <Project Path="CajeroCUNOR/CajeroCUNOR.csproj" />
+</Solution>
