@@ -10,12 +10,18 @@ namespace CajeroCUNOR
     {
         private TextBox txtTarjeta, txtPin, txtTokenRFID;
         private Button btnIngresar;
+        private LectorRFID lector = new LectorRFID(); // NUEVO
 
         public Form1()
         {
             InitializeComponent();
             ConfigurarUIPersonalizada();
             ClienteRed.IniciarHeartbeat();
+
+            // NUEVO: cuando llega un UID, se escribe en el campo Token RFID
+            lector.TarjetaLeida += uid => this.Invoke(new Action(() => txtTokenRFID.Text = uid));
+            if (!lector.Conectar("COM4"))
+                MessageBox.Show("No se pudo abrir COM4. Revisa que el Arduino esté conectado y el Monitor Serie cerrado.");
         }
 
         private void ConfigurarUIPersonalizada()
@@ -132,8 +138,6 @@ namespace CajeroCUNOR
 
             using (SqlConnection con = GestorSistema.ObtenerConexion())
             {
-                // (Deja intactas las validaciones de "tarjeta.Length" y "pin.Length" que están arriba)
-
                 // 1. ARMAMOS LA PETICIÓN JSON
                 JObject peticion = new JObject();
                 peticion["operacion"] = "LOGIN";
@@ -170,6 +174,13 @@ namespace CajeroCUNOR
                     MessageBox.Show(mensaje, "Respuesta del Servidor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
+        }
+
+        // NUEVO: cierra el puerto COM al cerrar la ventana
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            lector.Desconectar();
+            base.OnFormClosing(e);
         }
     }
 }
